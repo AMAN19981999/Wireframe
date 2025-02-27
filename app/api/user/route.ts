@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/configs/db";
 import { usersTable } from "@/configs/schema";
 
+
 export async function POST(req: NextRequest) {
     const { userEmail, userName } = await req.json();
     console.log(userEmail)
@@ -30,14 +31,44 @@ export async function POST(req: NextRequest) {
     // }
 }
 
+
+
+
+// export async function GET(req: Request) {
+//     const reqUrl = req.url;
+//     const { searchParams } = new URL(reqUrl);
+//     const email = searchParams?.get('email');
+
+//     if (email) {
+//         const result = await db.select().from(usersTable)
+//             .where(eq(usersTable.email, email));
+//         return NextResponse.json(result[0]);
+//     }
+// }
+
+
 export async function GET(req: Request) {
     const reqUrl = req.url;
     const { searchParams } = new URL(reqUrl);
-    const email = searchParams?.get('email');
-
-    if (email) {
-        const result = await db.select().from(usersTable)
-            .where(eq(usersTable.email, email));
-        return NextResponse.json(result[0]);
+    const email = searchParams.get("email");
+  
+    if (!email) {
+      return NextResponse.json({ error: "Email query parameter is required." }, { status: 400 });
     }
-}
+  
+    try {
+      const result = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.email, email));
+  
+      if (!result.length) {
+        return NextResponse.json({ error: "User not found." }, { status: 404 });
+      }
+  
+      return NextResponse.json(result[0]);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
+  }
