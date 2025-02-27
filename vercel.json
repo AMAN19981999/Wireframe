@@ -1,6 +1,6 @@
 {
     "functions": {
-      "api/**/*.js": {
+      "app/api/ai-model/route.js": {
         "maxDuration": 60
       }
     }
